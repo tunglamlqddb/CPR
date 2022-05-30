@@ -233,7 +233,7 @@ for t, ncla in taskcla:
 
     print('Save at ' + args.output)
     np.savetxt(args.output, acc, '%.4f')
-    torch.save(net.state_dict(), './weights/' + log_name + '_task_{}.pt'.format(t))
+    # torch.save(net.state_dict(), './weights/' + log_name + '_task_{}.pt'.format(t))
     
 print('[Elapsed time = {:.1f} h]'.format((time.time() - tstart) / (60 * 60)))
 

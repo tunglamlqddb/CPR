@@ -101,13 +101,13 @@ def split_cub200_loader(root, seg_root, seg, cropped, type):
 
             if folder_img_idx < tr_num:
                 s = 'train'
-                print ('train', img.shape)
+                # print ('train', img.shape)
             elif folder_img_idx < tr_num + val_num:
                 s = 'valid'
-                print ('valid', img.shape)
+                # print ('valid', img.shape)
             else:
                 s = 'test'
-                print ('test', img.shape)
+                # print ('test', img.shape)
                 
             img = (img - mean) / std
             img_tensor = Tensor(img).float()
@@ -117,6 +117,7 @@ def split_cub200_loader(root, seg_root, seg, cropped, type):
             data[task_idx][s]['y'].append(label) 
             
             folder_img_idx += 1
+        print(folder)
     return data
 
 def get(seed=0, fixed_order=False, pc_valid=0, tasknum = 10, seg=False, cropped=False, type='padding'):
@@ -129,8 +130,8 @@ def get(seed=0, fixed_order=False, pc_valid=0, tasknum = 10, seg=False, cropped=
     # mini_imagenet
     if not os.path.isdir('../data/binary_split_cub200_new_seg'+str(seg)):
         os.makedirs('../data/binary_split_cub200_new_seg'+str(seg))
-        data = split_cub200_loader( 'CUB_200_2011',
-                                     'segmentations',
+        data = split_cub200_loader( '../data/CUB_200_2011',
+                                     '../data/segmentations',
                                     seg=seg, cropped=cropped, type=type)
         
         for i in range(10):
@@ -150,9 +151,9 @@ def get(seed=0, fixed_order=False, pc_valid=0, tasknum = 10, seg=False, cropped=
             data[i] = dict.fromkeys(['name','ncla','train','test'])
             for s in ['train','test', 'valid']:
                 data[i][s]={'x':[],'y':[]}
-                data[i][s]['x'] = torch.load(os.path.join(os.path.expanduser('data/binary_split_cub200_new'),
+                data[i][s]['x'] = torch.load(os.path.join(os.path.expanduser('../data/binary_split_cub200_new'),
                                                           'data' + str(i) + s + 'x.bin'))
-                data[i][s]['y'] = torch.load(os.path.join(os.path.expanduser('data/binary_split_cub200_new'),
+                data[i][s]['y'] = torch.load(os.path.join(os.path.expanduser('../data/binary_split_cub200_new'),
                                                           'data' + str(i) + s + 'y.bin'))
             data[i]['ncla']=len(np.unique(data[i]['train']['y'].numpy()))
             data[i]['name']='split_cub200-'+str(ids[i-1])
