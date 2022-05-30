@@ -20,12 +20,12 @@ def split_cub200_loader(root, seg_root, seg, cropped, type):
         data[i]['valid'] = {'x': [], 'y': []}
 
     folders = sorted(os.listdir(root+'/images'))
-    seg_folders = sorted(os.listdir(seg_root))
+    # seg_folders = sorted(os.listdir(seg_root))
 
-    with open(root+'/bounding_boxes.txt', 'r') as f:
-        bounding_boxes = f.read().splitlines()
-        bounding_boxes = [item.split() for item in bounding_boxes]
-        bounding_boxes = [[int(float(i)) for i in item] for item in bounding_boxes]
+    # with open(root+'/bounding_boxes.txt', 'r') as f:
+    #     bounding_boxes = f.read().splitlines()
+    #     bounding_boxes = [item.split() for item in bounding_boxes]
+    #     bounding_boxes = [[int(float(i)) for i in item] for item in bounding_boxes]
     
     mean = np.array([[[123.77, 127.55, 110.25]]])
     std = np.array([[[59.16, 58.06, 67.99]]])
@@ -34,8 +34,6 @@ def split_cub200_loader(root, seg_root, seg, cropped, type):
     label_true = -1
     
     for folder in folders:
-        cnt=0
-
         folder_path = os.path.join(root+'/images', folder)
         seg_folder_path = os.path.join(seg_root, folder)
         img_list = sorted(os.listdir(folder_path))
@@ -60,7 +58,6 @@ def split_cub200_loader(root, seg_root, seg, cropped, type):
                     continue
             except:
                 continue
-            cnt+=1
             if seg:
                 seg_path = os.path.join(seg_folder_path, seg_ims)
                 seg_img = plt.imread(seg_path).astype(int)
@@ -120,7 +117,6 @@ def split_cub200_loader(root, seg_root, seg, cropped, type):
             data[task_idx][s]['y'].append(label) 
             
             folder_img_idx += 1
-            if cnt>10: break
     return data
 
 def get(seed=0, fixed_order=False, pc_valid=0, tasknum = 10, seg=False, cropped=False, type='padding'):
@@ -131,11 +127,10 @@ def get(seed=0, fixed_order=False, pc_valid=0, tasknum = 10, seg=False, cropped=
     
     # Pre-load
     # mini_imagenet
-    if not os.path.isdir('data/binary_split_cub200_new/'):
-        os.makedirs('data/binary_split_cub200_new')
-        root = '../data/CUB200(2011)'
-        data = split_cub200_loader(os.path.join(root, 'CUB_200_2011/CUB_200_2011'),
-                                    os.path.join(root, 'segmentations'),
+    if not os.path.isdir('../data/binary_split_cub200_new_seg'+str(seg)):
+        os.makedirs('../data/binary_split_cub200_new_seg'+str(seg))
+        data = split_cub200_loader( 'CUB_200_2011',
+                                     'segmentations',
                                     seg=seg, cropped=cropped, type=type)
         
         for i in range(10):
@@ -143,9 +138,9 @@ def get(seed=0, fixed_order=False, pc_valid=0, tasknum = 10, seg=False, cropped=
 #                 data[i][s]['x']=torch.stack(data[i][s]['x']).view(-1,size[0],size[1],size[2])
 #                 data[i][s]['x']=torch.stack(data[i][s]['x'])
                 data[i][s]['y']=torch.LongTensor(np.array(data[i][s]['y'],dtype=int)).view(-1)
-                torch.save(data[i][s]['x'],os.path.join(os.path.expanduser('data/binary_split_cub200_new'),
+                torch.save(data[i][s]['x'],os.path.join(os.path.expanduser('../data/binary_split_cub200_new_seg'+str(seg)),
                                                         'data' + str(i) + s + 'x.bin'))
-                torch.save(data[i][s]['y'],os.path.join(os.path.expanduser('data/binary_split_cub200_new'),
+                torch.save(data[i][s]['y'],os.path.join(os.path.expanduser('../data/binary_split_cub200_new_seg'+str(seg)),
                                                         'data' + str(i) + s + 'y.bin'))
     else:
         data[0] = dict.fromkeys(['name','ncla','train','test'])
